@@ -1,3 +1,4 @@
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import {
   CircularProgress,
   Paper,
@@ -6,11 +7,12 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
+  TableRow
 } from "@mui/material";
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useMemo } from "react";
@@ -22,8 +24,7 @@ import {
   selectHiddenHeaders,
 } from "../../store/slice/headersDataSlice";
 import allColumns from "./columns";
-import { StyledTableCell, StyledTableRow } from "./styles";
-
+import { StyledIconButton, StyledTableCell, StyledTableRow } from "./styles";
 export const MainTable = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectHeadersData);
@@ -41,6 +42,7 @@ export const MainTable = () => {
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   switch (status) {
@@ -54,7 +56,14 @@ export const MainTable = () => {
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <StyledTableCell key={header.id}>
+                    <StyledTableCell key={header.id} align="center">
+                      {header.column.getCanSort() && (
+                        <StyledIconButton
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <SwapVertIcon />
+                        </StyledIconButton>
+                      )}
                       {header.isPlaceholder
                         ? null
                         : flexRender(

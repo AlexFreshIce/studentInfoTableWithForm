@@ -7,7 +7,7 @@ const columns = [
   columnHelper.accessor("f_pers_young_spec_id", {
     header: "ID",
     // cell: (info) => info.getValue(),
-    size: 20,
+    size: 35,
   }),
   columnHelper.accessor("insert_date", {
     header: "Дата и время добавления записи",
