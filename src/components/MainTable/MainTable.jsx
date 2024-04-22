@@ -11,22 +11,28 @@ import {
 import {
   flexRender,
   getCoreRowModel,
-  useReactTable
+  useReactTable,
 } from "@tanstack/react-table";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchHeadersData,
   selectFetchHeadersDataStatus,
   selectHeadersData,
+  selectHiddenHeaders,
 } from "../../store/slice/headersDataSlice";
-import columns from "./columns";
+import allColumns from "./columns";
 import { StyledTableCell, StyledTableRow } from "./styles";
 
 export const MainTable = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectHeadersData);
+  const hiddenHeaders = useSelector(selectHiddenHeaders);
   const status = useSelector(selectFetchHeadersDataStatus);
+  const columns = useMemo(
+    () => allColumns.filter((_, i) => !hiddenHeaders.includes(i)),
+    [hiddenHeaders]
+  );
   useEffect(() => {
     dispatch(fetchHeadersData());
   }, [dispatch]);

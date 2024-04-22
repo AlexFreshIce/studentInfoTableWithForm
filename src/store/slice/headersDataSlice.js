@@ -5,11 +5,12 @@ const initialState = {
   data: [],
   status: null,
   error: null,
+  hiddenHeaders: [],
 };
 
 export const fetchHeadersData = createAsyncThunk(
   "header/fetchHeadersData",
-  async function (_, {rejectWithValue}) {
+  async function (_, { rejectWithValue }) {
     try {
       const response = await customFetch(ENDPOINTS.HEADER);
       if (!response.ok) {
@@ -18,7 +19,7 @@ export const fetchHeadersData = createAsyncThunk(
       const data = await response.json();
       return data;
     } catch (e) {
-      return rejectWithValue(e.message)
+      return rejectWithValue(e.message);
     }
   }
 );
@@ -47,7 +48,17 @@ export const headersDataSlice = createSlice({
       const newHeader = { ...state.data[headerIndex], ...action.payload };
       state.data[headerIndex] = newHeader;
     },
+    hideHeaders: (state, action) => {
+      if (state.hiddenHeaders.indexOf(action.payload) !== -1) {
+        state.hiddenHeaders = state.hiddenHeaders.filter(
+          (el) => el !== action.payload
+        );
+      } else {
+        state.hiddenHeaders = [...state.hiddenHeaders, action.payload];
+      }
+    },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchHeadersData.pending, (state) => {
@@ -65,9 +76,13 @@ export const headersDataSlice = createSlice({
   },
 });
 
-export const { createHeader, updateHeader } = headersDataSlice.actions;
+export const { createHeader, updateHeader, hideHeaders } =
+  headersDataSlice.actions;
 
 export default headersDataSlice.reducer;
 
-export const selectFetchHeadersDataStatus = (state) => state.headersDataSlice.status;
+export const selectFetchHeadersDataStatus = (state) =>
+  state.headersDataSlice.status;
 export const selectHeadersData = (state) => state.headersDataSlice.data;
+export const selectHiddenHeaders = (state) =>
+  state.headersDataSlice.hiddenHeaders;
