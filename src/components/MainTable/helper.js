@@ -3,11 +3,11 @@ import { parseDate } from "../../utils/parseData";
 
 const columnHelper = createColumnHelper();
 
-const columns = [
+export const allColumns = [
   columnHelper.accessor("f_pers_young_spec_id", {
     header: "ID",
     // cell: (info) => info.getValue(),
-    size: 35,
+    size: 30,
   }),
   columnHelper.accessor("insert_date", {
     header: "Дата и время добавления записи",
@@ -40,5 +40,3 @@ const columns = [
     size: 120,
   }),
 ];
-
-export default columns

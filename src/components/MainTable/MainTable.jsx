@@ -23,8 +23,10 @@ import {
   selectHeadersData,
   selectHiddenHeaders,
 } from "../../store/slice/headersDataSlice";
-import allColumns from "./columns";
+import {allColumns} from "./helper";
 import { StyledIconButton, StyledTableCell, StyledTableRow } from "./styles";
+
+
 export const MainTable = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectHeadersData);

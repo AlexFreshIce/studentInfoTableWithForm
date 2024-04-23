@@ -12,7 +12,7 @@ import {
   hideHeaders,
   selectHiddenHeaders,
 } from "../../store/slice/headersDataSlice";
-import allColumns from "../MainTable/columns";
+import {allColumns} from "../MainTable/helper";
 
 
 export const HeaderList = ({ handleClickAway }) => {

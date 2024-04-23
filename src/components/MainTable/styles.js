@@ -5,7 +5,7 @@ export const StyledTableCell = styled(TableCell)(() => ({
     backgroundColor: "#c1e6f9",
     position: "relative",
     verticalAlign: "top",
-    paddingLeft: "0",
+    // paddingLeft: "5px",
     paddingRight: "30px",
     overflow: "hidden",
   },
