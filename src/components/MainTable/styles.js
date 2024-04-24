@@ -5,9 +5,9 @@ export const StyledTableCell = styled(TableCell)(() => ({
     backgroundColor: "#c1e6f9",
     position: "relative",
     verticalAlign: "top",
-    // paddingLeft: "5px",
+    paddingLeft: "10px",
     paddingRight: "30px",
-    overflow: "hidden",
+    // overflow: "hidden",
   },
 }));
 
@@ -22,8 +22,9 @@ export const StyledTableRow = styled(TableRow)(() => ({
 
 export const StyledIconButton = styled(IconButton)(() => ({
   position: "absolute",
-  right: "2px",
-  top: "8px",
+  right: "5px",
+  top: "16px",
   zIndex: "10",
+  padding:0
 }));
 

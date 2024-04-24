@@ -7,7 +7,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
 } from "@mui/material";
 import {
   flexRender,
@@ -17,21 +17,28 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   fetchHeadersData,
   selectFetchHeadersDataStatus,
   selectHeadersData,
   selectHiddenHeaders,
 } from "../../store/slice/headersDataSlice";
-import {allColumns} from "./helper";
+import { TableBar } from "../TableBar/TableBar";
+import { allColumns } from "./helper";
 import { StyledIconButton, StyledTableCell, StyledTableRow } from "./styles";
-
 
 export const MainTable = () => {
   const dispatch = useDispatch();
   const data = useSelector(selectHeadersData);
   const hiddenHeaders = useSelector(selectHiddenHeaders);
   const status = useSelector(selectFetchHeadersDataStatus);
+
+  const navigate = useNavigate();
+  const handleRowClick = (rowData) => {
+    navigate(`/form/${rowData.f_pers_young_spec_id}`, {state:rowData});
+  };
+
   const columns = useMemo(
     () => allColumns.filter((_, i) => !hiddenHeaders.includes(i)),
     [hiddenHeaders]
@@ -52,55 +59,63 @@ export const MainTable = () => {
       return <CircularProgress />;
     case "resolved":
       return (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <StyledTableCell key={header.id} align="center">
-                      {header.column.getCanSort() && (
-                        <StyledIconButton
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          <SwapVertIcon />
-                        </StyledIconButton>
-                      )}
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </StyledTableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHead>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <StyledTableRow
-                  key={row.id}
-                  onClick={() => {
-                    console.log(row);
-                  }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      sx={{ width: cell.column.getSize() }}
-                      key={cell.id}
+        <>
+          <TableBar />
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <StyledTableCell key={header.id} align="center">
+                        {header.column.getCanSort() && (
+                          <StyledIconButton
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            <SwapVertIcon />
+                          </StyledIconButton>
+                        )}
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </StyledTableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => {
+              
+                  return (
+               
+                    <StyledTableRow
+                      key={row.id}
+                      onClick={() => {
+                        handleRowClick(row.original);
+                      }}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          sx={{ width: cell.column.getSize() }}
+                          key={cell.id}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </StyledTableRow>
+           
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
       );
     default:
       return <CircularProgress />;

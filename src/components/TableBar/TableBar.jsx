@@ -19,7 +19,7 @@ export const TableBar = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: "white", height:"50px", paddingTop:"10px"}}>
+    <Box sx={{ bgcolor: "white", height:"48px"}}>
       <Tooltip
         PopperProps={{
           disablePortal: true,

@@ -1,28 +1,24 @@
+import { CircularProgress } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
+import { RouterProvider } from "react-router-dom";
 import "./App.css";
-import { MainTable } from "./components/MainTable/MainTable";
+import { router } from "./router";
 import store from "./store";
-import { TableBar } from "./components/TableBar/TableBar";
-import { MainForm } from "./components/MainForm/MainForm";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 
 const theme = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
   },
 });
 
 function App() {
   return (
     <Provider store={store}>
-       <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <h2>Таблица</h2>
-      <TableBar/>
-      <MainTable />
-      <h2>Форма</h2>
-      <MainForm/>
+      <RouterProvider router={router} fallbackElement={<CircularProgress />} />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
       </ThemeProvider>
     </Provider>
   );

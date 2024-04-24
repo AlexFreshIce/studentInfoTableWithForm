@@ -18,63 +18,54 @@ import {
   selectLinesData,
 } from "../../store/slice/formLinesDataSlice";
 
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   COLUMN_NAMES,
+  INIT_FORM_DATA,
   generateInitialValues,
   generateTableHeaders,
   generateTableRows,
 } from "./helper";
 import { StyledInput } from "./styles";
 
-export const MainForm = ({
-  // f_pers_young_spec_id,
-  // insert_date,
-  // insert_user,
-  // org_employee,
-  rep_beg_period,
-  rep_end_period,
-  // update_date,
-  update_user,
-}) => {
+export const MainForm = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [formData, setFormData] = useState(INIT_FORM_DATA);
   const rowData = useSelector(selectLinesData);
-  const [formData, setFormData] = useState({
-    data_0_0: 0,
-    data_0_1: 0,
-    data_0_2: 0,
-    data_1_0: 0,
-    data_1_1: 0,
-    data_1_2: 0,
-    data_2_0: 0,
-    data_2_1: 0,
-    data_2_2: 0,
-    data_3_0: 0,
-    data_3_1: 0,
-    data_3_2: 0,
-    data_4_0: 0,
-    data_4_1: 0,
-    data_4_2: 0,
-    data_5_0: 0,
-    data_5_1: 0,
-    data_5_2: 0,
-    insert_user: update_user || "",
-    rep_beg_period: rep_beg_period || "",
-    rep_end_period: rep_end_period || "",
-  });
+
+  const {
+    state: {
+      f_pers_young_spec_id,
+      rep_beg_period,
+      rep_end_period,
+      insert_user,
+      update_user,
+    },
+  } = useLocation();
+
 
   useEffect(() => {
-    if (rowData) {
+    // console.log(rowData, formId);
+    if ((rowData, f_pers_young_spec_id)) {
       const updInitValue = generateInitialValues(
         COLUMN_NAMES.length - 1,
         rowData.length + 1,
         data,
-        25
+        f_pers_young_spec_id
       );
+      // console.log(updInitValue);
       setFormData((prev) => {
-        return { ...prev, ...updInitValue };
+        return {
+          ...prev,
+          ...updInitValue,
+          rep_beg_period,
+          rep_end_period,
+          insert_user: update_user || insert_user,
+        };
       });
     }
-  }, [rowData]);
+  }, [rowData, f_pers_young_spec_id]);
 
   useEffect(() => {
     dispatch(fetchLinesData());
@@ -85,7 +76,7 @@ export const MainForm = ({
   const tableData = useMemo(
     () =>
       generateTableRows(COLUMN_NAMES.slice(1), [...rowData, { name: "Итог" }]),
-    [COLUMN_NAMES, rowData]
+    [rowData]
   );
 
   return (
@@ -94,6 +85,7 @@ export const MainForm = ({
         initialValues={formData}
         enableReinitialize
         onSubmit={(values) => {
+          navigate(`/`);
           console.log(values);
         }}
       >
@@ -127,7 +119,7 @@ export const MainForm = ({
                   id="insert_user"
                   name="insert_user"
                   placeholder="Введите данные"
-                  sx={{ margin: "0 8px" }}
+                  sx={{ margin: "0 8px", width: "480px" }}
                 />
               </Box>
             </Box>

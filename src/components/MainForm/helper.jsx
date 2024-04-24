@@ -8,6 +8,30 @@ export const COLUMN_NAMES = [
   "Количества молодых специалистов по Распределению",
 ];
 
+export const INIT_FORM_DATA = {
+  data_0_0: 0,
+  data_0_1: 0,
+  data_0_2: 0,
+  data_1_0: 0,
+  data_1_1: 0,
+  data_1_2: 0,
+  data_2_0: 0,
+  data_2_1: 0,
+  data_2_2: 0,
+  data_3_0: 0,
+  data_3_1: 0,
+  data_3_2: 0,
+  data_4_0: 0,
+  data_4_1: 0,
+  data_4_2: 0,
+  data_5_0: 0,
+  data_5_1: 0,
+  data_5_2: 0,
+  insert_user: "",
+  rep_beg_period: "",
+  rep_end_period: "",
+}
+
 export const generateKeys = (current, max, isRow) => {
   const keys = [];
   for (let i = 0; i < max; i++) {
@@ -63,7 +87,8 @@ export const generateTableRows = (columns, rows) => {
                 rowName.name === "Итог" || colIndex === 0 ? true : false
               }
               sx={{ textAlign: "right", height:"40px" }}
-
+              type="number"
+              inputMode="numeric"
               // disabled={rowName === "Итог" || colIndex === 0 ? true : false}
             />
           </TableCell>
@@ -76,12 +101,13 @@ export const generateTableRows = (columns, rows) => {
 
 
 export const getCurrentFormDataById = (data = [], currentFormId) => {
+  // console.log(data, currentFormId);
   if (!currentFormId) return [];
 
   const maxValues = {};
 
   data.forEach((obj) => {
-    if (obj.f_pers_young_spec_id === currentFormId) {
+    if (obj.f_pers_young_spec_id === +currentFormId) {
       const curDate = Date.parse(obj.update_date);
       const inArrDate = Date.parse(maxValues[obj.nsi_pers_indicate_id]);
       if (!maxValues[obj.nsi_pers_indicate_id] || inArrDate < curDate) {
