@@ -1,5 +1,5 @@
 import { styled } from "@mui/material";
-import { CustomField } from "../CustomField/CustomField";
+import { CustomField } from "./CustomField";
 
 export const StyledInput = styled(CustomField)(({ theme, readOnly }) => ({
   backgroundColor: readOnly ? "#f0f4fc" : theme.palette.background.paper,
@@ -19,10 +19,10 @@ export const StyledInput = styled(CustomField)(({ theme, readOnly }) => ({
   
     // Скрытие стандартных кнопок регулировки ввода числа
     "&::-webkit-inner-spin-button, &::-webkit-outer-spin-button": {
-      "-webkit-appearance": "none",
+      "WebkitAppearance": "none",
       margin: 0,
     },
     "&[type='number']": {
-      "-moz-appearance": "textfield",
+      "MozAppearance": "textfield",
     },
 }));

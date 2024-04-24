@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@mui/material";
-import { StyledInput } from "./styles";
+import { StyledInput } from "../CustomField/styles";
 
 export const COLUMN_NAMES = [
   "Наименование показателя",

@@ -12,13 +12,14 @@ import {
 import { Form, Formik } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { data } from "../../api/mockData";
 import {
   fetchLinesData,
   selectLinesData,
 } from "../../store/slice/formLinesDataSlice";
 
 import { useLocation, useNavigate } from "react-router-dom";
+import { fetchFormData, selectFormData } from "../../store/slice/formDataSlice";
+import { StyledInput } from "../CustomField/styles";
 import {
   COLUMN_NAMES,
   INIT_FORM_DATA,
@@ -26,13 +27,13 @@ import {
   generateTableHeaders,
   generateTableRows,
 } from "./helper";
-import { StyledInput } from "./styles";
 
 export const MainForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(INIT_FORM_DATA);
   const rowData = useSelector(selectLinesData);
+  const data = useSelector(selectFormData);
 
   const {
     state: {
@@ -44,10 +45,9 @@ export const MainForm = () => {
     },
   } = useLocation();
 
-
   useEffect(() => {
     // console.log(rowData, formId);
-    if ((rowData, f_pers_young_spec_id)) {
+    if ((rowData, f_pers_young_spec_id, data)) {
       const updInitValue = generateInitialValues(
         COLUMN_NAMES.length - 1,
         rowData.length + 1,
@@ -65,10 +65,11 @@ export const MainForm = () => {
         };
       });
     }
-  }, [rowData, f_pers_young_spec_id]);
+  }, [rowData, f_pers_young_spec_id, data]);
 
   useEffect(() => {
     dispatch(fetchLinesData());
+    dispatch(fetchFormData());
   }, [dispatch]);
 
   const tableHeaders = useMemo(() => generateTableHeaders(COLUMN_NAMES), []);
