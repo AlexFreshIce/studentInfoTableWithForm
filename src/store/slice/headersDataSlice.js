@@ -1,5 +1,10 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+} from "@reduxjs/toolkit";
 import { ENDPOINTS, customFetch } from "../../api";
+import { setError, setPending } from "../../utils/setStateStatus";
 
 const initialState = {
   data: [],
@@ -9,7 +14,7 @@ const initialState = {
 };
 
 export const fetchHeadersData = createAsyncThunk(
-  "header/fetchHeadersData",
+  "headers/fetchHeadersData",
   async function (_, { rejectWithValue }) {
     try {
       const response = await customFetch(ENDPOINTS.HEADER);
@@ -24,12 +29,36 @@ export const fetchHeadersData = createAsyncThunk(
   }
 );
 
+export const patchHeaderData = createAsyncThunk(
+  "headers/patchHeaderData",
+  async function (data, { rejectWithValue, dispatch, getState }) {
+    try {
+      const url = ENDPOINTS.HEADER + `${data.f_pers_young_spec_id}/`;
+
+      const response = await customFetch(url, "PATCH", data);
+      if (!response.ok) {
+        throw new Error("Server Error!");
+      }
+      const responseData = await response.json();
+      const isEmptyHeaders = !getState().headers.data.length;
+
+      if (isEmptyHeaders) {
+        console.log(isEmptyHeaders);
+        dispatch(fetchHeadersData());
+      } else {
+        dispatch(updateHeader(responseData));
+      }
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);
+
 export const headersDataSlice = createSlice({
-  name: "header",
+  name: "headers",
   initialState,
   reducers: {
     createHeader: (state, action) => {
-      console.log(state.data);
       const lastId = state.data.lengths
         ? state.data.reduce((acc, el) => {
             return el.f_pers_young_spec_id > acc
@@ -45,8 +74,7 @@ export const headersDataSlice = createSlice({
         (header) =>
           header.f_pers_young_spec_id === action.payload.f_pers_young_spec_id
       );
-      const newHeader = { ...state.data[headerIndex], ...action.payload };
-      state.data[headerIndex] = newHeader;
+      state.data[headerIndex] = action.payload;
     },
     hideHeaders: (state, action) => {
       if (state.hiddenHeaders.indexOf(action.payload) !== -1) {
@@ -61,18 +89,17 @@ export const headersDataSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchHeadersData.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
+      .addCase(fetchHeadersData.pending, setPending)
+      .addCase(patchHeaderData.pending, setPending)
       .addCase(fetchHeadersData.fulfilled, (state, action) => {
         state.data = action.payload;
         state.status = "resolved";
       })
-      .addCase(fetchHeadersData.rejected, (state, action) => {
-        state.error = action.payload;
-        state.status = "rejected";
-      });
+      .addCase(patchHeaderData.fulfilled, (state) => {
+        state.status = "resolved";
+      })
+      .addCase(fetchHeadersData.rejected, setError)
+      .addCase(patchHeaderData.rejected, setError);
   },
 });
 
@@ -81,8 +108,11 @@ export const { createHeader, updateHeader, hideHeaders } =
 
 export default headersDataSlice.reducer;
 
-export const selectFetchHeadersDataStatus = (state) =>
-  state.headersDataSlice.status;
-export const selectHeadersData = (state) => state.headersDataSlice.data;
-export const selectHiddenHeaders = (state) =>
-  state.headersDataSlice.hiddenHeaders;
+export const selectFetchHeadersDataStatus = (state) => state.headers.status;
+export const selectHeadersData = (state) => state.headers.data;
+export const selectHiddenHeaders = (state) => state.headers.hiddenHeaders;
+
+export const getHeaderById = createSelector(
+  [selectHeadersData, (_, id) => id],
+  (headers, id) => headers.find((header) => header.f_pers_young_spec_id === +id)
+);

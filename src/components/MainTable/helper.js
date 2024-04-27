@@ -1,5 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { parseDate } from "../../utils/parseData";
+import { parseDate } from "../../utils/date";
 
 const columnHelper = createColumnHelper();
 

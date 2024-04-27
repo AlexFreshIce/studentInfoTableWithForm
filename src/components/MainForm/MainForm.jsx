@@ -16,8 +16,7 @@ import {
   fetchLinesData,
   selectLinesData,
 } from "../../store/slice/formLinesDataSlice";
-
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { fetchFormData, selectFormData } from "../../store/slice/formDataSlice";
 import { StyledInput } from "../CustomField/styles";
 import {
@@ -27,53 +26,48 @@ import {
   generateTableHeaders,
   generateTableRows,
 } from "./helper";
+import {
+  fetchHeadersData,
+  getHeaderById,
+  patchHeaderData,
+} from "../../store/slice/headersDataSlice";
+import { getCurrentDate } from "../../utils/date";
 
 export const MainForm = () => {
-  const navigate = useNavigate();
+  const { formId } = useParams();
+  const [initData, setInitData] = useState(INIT_FORM_DATA);
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState(INIT_FORM_DATA);
   const rowData = useSelector(selectLinesData);
-  const data = useSelector(selectFormData);
-
-  const {
-    state: {
-      f_pers_young_spec_id,
-      rep_beg_period,
-      rep_end_period,
-      insert_user,
-      update_user,
-    },
-  } = useLocation();
-
-  useEffect(() => {
-    // console.log(rowData, formId);
-    if ((rowData, f_pers_young_spec_id, data)) {
-      const updInitValue = generateInitialValues(
-        COLUMN_NAMES.length - 1,
-        rowData.length + 1,
-        data,
-        f_pers_young_spec_id
-      );
-      // console.log(updInitValue);
-      setFormData((prev) => {
-        return {
-          ...prev,
-          ...updInitValue,
-          rep_beg_period,
-          rep_end_period,
-          insert_user: update_user || insert_user,
-        };
-      });
-    }
-  }, [rowData, f_pers_young_spec_id, data]);
+  const formData = useSelector(selectFormData);
+  const header = useSelector((state) => getHeaderById(state, formId));
 
   useEffect(() => {
     dispatch(fetchLinesData());
     dispatch(fetchFormData());
+    dispatch(fetchHeadersData());
   }, [dispatch]);
 
-  const tableHeaders = useMemo(() => generateTableHeaders(COLUMN_NAMES), []);
+  useEffect(() => {
+    if (rowData && formData && header) {
+      const updInitValue = generateInitialValues(
+        COLUMN_NAMES.length - 1,
+        rowData.length + 1,
+        formData,
+        header.f_pers_young_spec_id
+      );
+      setInitData((prev) => {
+        return {
+          ...prev,
+          ...updInitValue,
+          rep_beg_period: header.rep_beg_period,
+          rep_end_period: header.rep_end_period,
+          insert_user: header.update_user || header.insert_user,
+        };
+      });
+    }
+  }, [rowData, formData, header]);
 
+  const tableHeaders = useMemo(() => generateTableHeaders(COLUMN_NAMES), []);
   const tableData = useMemo(
     () =>
       generateTableRows(COLUMN_NAMES.slice(1), [...rowData, { name: "Итог" }]),
@@ -83,11 +77,31 @@ export const MainForm = () => {
   return (
     <Box>
       <Formik
-        initialValues={formData}
+        initialValues={initData}
         enableReinitialize
         onSubmit={(values) => {
-          navigate(`/`);
-          console.log(values);
+          const currentDate = getCurrentDate();
+          const isNew = formId.toLowerCase().includes("new");
+          const data = {
+            f_pers_young_spec_id: header.f_pers_young_spec_id,
+            org_employee: header.org_employee,
+            rep_beg_period: values.rep_beg_period,
+            rep_end_period: values.rep_end_period,
+          };
+          if (isNew) {
+            data["insert_user"] = values.insert_user;
+            data["update_user"] = values.insert_user;
+            data["insert_date"] = currentDate;
+            data["update_date"] = currentDate;
+          } else {
+            data["insert_user"] = header.insert_user;
+            data["update_user"] = values.insert_user;
+            data["insert_date"] = header.insert_date;
+            data["update_date"] = currentDate;
+          }
+          dispatch(patchHeaderData(data));
+          // console.log(values);
+          // navigate(`/`);
         }}
       >
         {() => (

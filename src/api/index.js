@@ -9,12 +9,14 @@ export const ENDPOINTS = {
 export const customFetch = async (
   endpoint = "",
   method = "GET",
-  data = null
+  data = null,
+  additionalHeaders = {}
 ) => {
   const url = BASE_URL + endpoint;
   const body = data ? JSON.stringify(data) : null;
   return await fetch(url, {
     method,
     body,
+    headers: { "Content-Type": "application/json", ...additionalHeaders },
   });
 };

@@ -35,8 +35,11 @@ export const MainTable = () => {
   const status = useSelector(selectFetchHeadersDataStatus);
 
   const navigate = useNavigate();
+  // const handleRowClick = (rowData) => {
+  //   navigate(`/form/${rowData.f_pers_young_spec_id}`, {state:rowData});
+  // };
   const handleRowClick = (rowData) => {
-    navigate(`/form/${rowData.f_pers_young_spec_id}`, {state:rowData});
+    navigate(`/form/${rowData.f_pers_young_spec_id}`);
   };
 
   const columns = useMemo(
@@ -88,9 +91,7 @@ export const MainTable = () => {
               </TableHead>
               <TableBody>
                 {table.getRowModel().rows.map((row) => {
-              
                   return (
-               
                     <StyledTableRow
                       key={row.id}
                       onClick={() => {
@@ -109,7 +110,6 @@ export const MainTable = () => {
                         </TableCell>
                       ))}
                     </StyledTableRow>
-           
                   );
                 })}
               </TableBody>

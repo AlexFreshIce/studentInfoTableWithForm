@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ENDPOINTS, customFetch } from "../../api";
+import { setError, setPending } from "../../utils/setStateStatus";
 
 const initialState = {
   data: [],
@@ -8,7 +9,7 @@ const initialState = {
 };
 
 export const fetchFormData = createAsyncThunk(
-  "header/fetchFormData",
+  "formData/fetchFormData",
   async function (_, { rejectWithValue }) {
     try {
       const response = await customFetch(ENDPOINTS.FORM_DATA);
@@ -24,30 +25,20 @@ export const fetchFormData = createAsyncThunk(
 );
 
 export const formDataSlice = createSlice({
-  name: "lines",
+  name: "formData",
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(fetchFormData.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
+      .addCase(fetchFormData.pending, setPending)
       .addCase(fetchFormData.fulfilled, (state, action) => {
         state.data = action.payload;
         state.status = "resolved";
       })
-      .addCase(fetchFormData.rejected, (state, action) => {
-        state.error = action.payload;
-        state.status = "rejected";
-      });
+      .addCase(fetchFormData.rejected, setError);
   },
 });
 
-// export const { createHeader, updateHeader, hideHeaders } =
-// formDataSlice.actions;
-
 export default formDataSlice.reducer;
 
-export const selectFetchFormDataStatus = (state) => state.formDataSlice.status;
-
-export const selectFormData = (state) => state.formDataSlice.data;
+export const selectFetchFormDataStatus = (state) => state.formData.status;
+export const selectFormData = (state) => state.formData.data;

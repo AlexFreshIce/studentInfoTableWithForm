@@ -4,7 +4,11 @@ import formLinesDataSlice from "./slice/formLinesDataSlice";
 import headersDataSlice from "./slice/headersDataSlice";
 
 const store = configureStore({
-  reducer: { headersDataSlice, formLinesDataSlice, formDataSlice },
+  reducer: {
+    headers: headersDataSlice,
+    lines: formLinesDataSlice,
+    formData: formDataSlice,
+  },
   devTools: import.meta.env.MODE !== "production",
 });
 
