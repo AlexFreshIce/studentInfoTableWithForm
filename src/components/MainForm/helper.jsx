@@ -169,6 +169,7 @@ export const createHeaderData = (values, header, isNew, currentDate) => {
     headerData["insert_date"] = header.insert_date;
     headerData["update_date"] = currentDate;
   }
+  return headerData;
 };
 
 export const createFormDataList = (
@@ -204,4 +205,14 @@ export const createFormDataList = (
     }
   }
   return resoult.slice(0, -1);
+};
+
+export const compareHeaders = (originHeader, newHeader) => {
+  if (
+    originHeader.rep_beg_period !== newHeader.rep_beg_period ||
+    originHeader.rep_end_period !== newHeader.rep_end_period ||
+    originHeader.update_user !== newHeader.update_user
+  ) {
+    return true;
+  } else return false;
 };

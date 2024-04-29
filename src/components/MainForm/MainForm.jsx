@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -12,26 +13,30 @@ import {
 import { Form, Formik } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   fetchFormData,
   postFormData,
+  selectFetchFormDataStatus,
   selectFormData,
 } from "../../store/slice/formDataSlice";
 import {
   fetchLinesData,
+  selectFetchLinesDataStatus,
   selectLinesData,
 } from "../../store/slice/formLinesDataSlice";
 import {
   fetchHeadersData,
   getHeaderById,
   patchHeaderData,
+  selectFetchHeadersDataStatus,
 } from "../../store/slice/headersDataSlice";
 import { getCurrentDate } from "../../utils/date";
 import { StyledInput } from "../CustomField/styles";
 import {
   COLUMN_NAMES,
   INIT_FORM_DATA,
+  compareHeaders,
   createFormDataList,
   createHeaderData,
   generateInitialValues,
@@ -53,8 +58,7 @@ const submitHandler = (
   const lastLineId = formData.at(-1).f_pers_young_spec_line_id;
 
   const headerData = createHeaderData(values, header, isNew, currentDate);
-
-  const formDataList = createFormDataList(
+  const formDataChangeList = createFormDataList(
     values,
     formId,
     lastLineId,
@@ -62,21 +66,32 @@ const submitHandler = (
     currentDate
   );
 
-  dispatch(patchHeaderData(headerData));
-  formDataList.forEach((data) => dispatch(postFormData(data)));
+  const isHeaderChange = compareHeaders(header, headerData);
+  if (isHeaderChange) {
+    dispatch(patchHeaderData(headerData));
+  }
+
+  formDataChangeList.forEach((data) => dispatch(postFormData(data)));
 
   setInitData(values);
-
-  // navigate(`/`);
 };
 
 export const MainForm = () => {
   const { formId } = useParams();
-  const [initData, setInitData] = useState(INIT_FORM_DATA);
+
   const dispatch = useDispatch();
+  const [initData, setInitData] = useState(INIT_FORM_DATA);
   const rowData = useSelector(selectLinesData);
   const formData = useSelector(selectFormData);
   const header = useSelector((state) => getHeaderById(state, formId));
+  const headersLoadStatus = useSelector(selectFetchHeadersDataStatus);
+  const linesDataLoadStatus = useSelector(selectFetchLinesDataStatus);
+  const formDataLoadStatus = useSelector(selectFetchFormDataStatus);
+
+  const isDataLoading =
+    headersLoadStatus === "loading" ||
+    linesDataLoadStatus === "loading" ||
+    formDataLoadStatus === "loading";
 
   useEffect(() => {
     dispatch(fetchLinesData());
@@ -110,6 +125,8 @@ export const MainForm = () => {
       generateTableRows(COLUMN_NAMES.slice(1), [...rowData, { name: "Итог" }]),
     [rowData]
   );
+
+  if (isDataLoading) return <CircularProgress />;
 
   return (
     <Box>
@@ -170,9 +187,27 @@ export const MainForm = () => {
                 <TableBody>{tableData}</TableBody>
               </Table>
             </TableContainer>
-            <Button type="submit" variant="contained" color="primary">
-              Сохранить
-            </Button>
+            <Box
+              display="flex"
+              sx={{
+                margin: "0px auto",
+                width: "240px",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button type="submit" variant="contained" color="primary">
+                Сохранить
+              </Button>
+              <Button
+                type="button"
+                variant="outlined"
+                color="primary"
+                component={Link}
+                to="/"
+              >
+                Закрыть
+              </Button>
+            </Box>
           </Form>
         )}
       </Formik>
