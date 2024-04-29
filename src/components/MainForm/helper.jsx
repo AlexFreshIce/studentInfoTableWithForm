@@ -30,7 +30,7 @@ export const INIT_FORM_DATA = {
   insert_user: "",
   rep_beg_period: "",
   rep_end_period: "",
-}
+};
 
 export const generateKeys = (current, max, isRow) => {
   const keys = [];
@@ -44,7 +44,7 @@ export const generateKeys = (current, max, isRow) => {
   return keys;
 };
 
-export const genKeys = (curRow, curCol, maxRow, maxCol) => {
+export const createKeyList = (curRow, curCol, maxRow, maxCol) => {
   if (curCol === 0 && curRow !== maxRow) {
     return generateKeys(curRow, maxCol, true);
   }
@@ -61,7 +61,9 @@ export const genKeys = (curRow, curCol, maxRow, maxCol) => {
 
 export const generateTableHeaders = (names) => {
   return names.map((name, nameIndex) => (
-    <TableCell key={nameIndex}  sx={{ textAlign: "center", width:"260px"}}>{name}</TableCell>
+    <TableCell key={nameIndex} sx={{ textAlign: "center", width: "260px" }}>
+      {name}
+    </TableCell>
   ));
 };
 
@@ -70,26 +72,24 @@ export const generateTableRows = (columns, rows) => {
     <TableRow key={rowIndex}>
       <TableCell>{rowName.name}</TableCell>
       {columns.map((_, colIndex) => {
-        const keys = genKeys(
+        const keys = createKeyList(
           rowIndex,
           colIndex,
           rows.length - 1,
           columns.length - 1
         );
         return (
-          <TableCell key={colIndex}  sx={{ textAlign: "center", }}>
+          <TableCell key={colIndex} sx={{ textAlign: "center" }}>
             <StyledInput
               id={`data_${rowIndex}_${colIndex}`}
               name={`data_${rowIndex}_${colIndex}`}
               keys={keys}
-              // value={props.values[`data_${rowIndex}_${colIndex}`]}
               readOnly={
                 rowName.name === "Итог" || colIndex === 0 ? true : false
               }
-              sx={{ textAlign: "right", height:"40px" }}
+              sx={{ textAlign: "right", height: "40px" }}
               type="number"
               inputMode="numeric"
-              // disabled={rowName === "Итог" || colIndex === 0 ? true : false}
             />
           </TableCell>
         );
@@ -98,10 +98,7 @@ export const generateTableRows = (columns, rows) => {
   ));
 };
 
-
-
 export const getCurrentFormDataById = (data = [], currentFormId) => {
-  // console.log(data, currentFormId);
   if (!currentFormId) return [];
 
   const maxValues = {};
@@ -109,7 +106,9 @@ export const getCurrentFormDataById = (data = [], currentFormId) => {
   data.forEach((obj) => {
     if (obj.f_pers_young_spec_id === +currentFormId) {
       const curDate = Date.parse(obj.update_date);
-      const inArrDate = Date.parse(maxValues[obj.nsi_pers_indicate_id]);
+      const inArrDate = Date.parse(
+        maxValues[obj.nsi_pers_indicate_id]?.nsi_pers_indicate_id || 0
+      );
       if (!maxValues[obj.nsi_pers_indicate_id] || inArrDate < curDate) {
         maxValues[obj.nsi_pers_indicate_id] = obj;
       }
@@ -125,16 +124,13 @@ export const generateInitialValues = (
   currentFormId
 ) => {
   const formData = getCurrentFormDataById(data, currentFormId);
+
   const initialValues = {};
   for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
     for (let colIndex = 0; colIndex < columns; colIndex++) {
-      // console.log(formData);
-      // console.log(`data.${rowIndex}.${colIndex}`);
-
       const findData = formData.find(
         (el) => el.nsi_pers_indicate_id === rowIndex + 1
       );
-      // console.log(findData);
       if (findData) {
         if (colIndex === 1) {
           initialValues[`data_${rowIndex}_${colIndex}`] = findData.target_count;
@@ -153,4 +149,59 @@ export const generateInitialValues = (
   }
 
   return initialValues;
+};
+
+export const createHeaderData = (values, header, isNew, currentDate) => {
+  const headerData = {
+    f_pers_young_spec_id: header.f_pers_young_spec_id,
+    org_employee: header.org_employee,
+    rep_beg_period: values.rep_beg_period,
+    rep_end_period: values.rep_end_period,
+  };
+  if (isNew) {
+    headerData["insert_user"] = values.insert_user;
+    headerData["update_user"] = values.insert_user;
+    headerData["insert_date"] = currentDate;
+    headerData["update_date"] = currentDate;
+  } else {
+    headerData["insert_user"] = header.insert_user;
+    headerData["update_user"] = values.insert_user;
+    headerData["insert_date"] = header.insert_date;
+    headerData["update_date"] = currentDate;
+  }
+};
+
+export const createFormDataList = (
+  values,
+  id,
+  lastLineId,
+  initData,
+  currentDate
+) => {
+  const resoult = [];
+  let currentLineId = lastLineId;
+
+  for (let inputName in values) {
+    if (inputName.includes("data") && inputName.at(-1) === "2") {
+      const indexArr = inputName.split("_");
+      const distribution_count = values[inputName];
+      const target_count = values[`data_${indexArr[1]}_1`];
+      if (
+        distribution_count !== initData[inputName] ||
+        target_count !== initData[`data_${indexArr[1]}_1`]
+      ) {
+        resoult.push({
+          distribution_count: distribution_count,
+          f_pers_young_spec_id: +id,
+          f_pers_young_spec_line_id: currentLineId,
+          nsi_pers_indicate_id: +indexArr[1] + 1,
+          target_count: target_count,
+          update_date: currentDate,
+          update_user: values.insert_user,
+        });
+        currentLineId++;
+      }
+    }
+  }
+  return resoult.slice(0, -1);
 };

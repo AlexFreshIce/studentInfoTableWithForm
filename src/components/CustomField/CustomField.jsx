@@ -11,7 +11,7 @@ export const CustomField = ({ keys = [], ...props }) => {
     if (keys.length) {
       setFieldValue(props.name, parseInt(summ));
     }
-  }, [setFieldValue, props.name, summ]);
+  }, [setFieldValue, props.name, summ, keys.length]);
 
   return (
     <>

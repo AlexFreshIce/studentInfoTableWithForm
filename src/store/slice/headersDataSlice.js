@@ -21,8 +21,8 @@ export const fetchHeadersData = createAsyncThunk(
       if (!response.ok) {
         throw new Error("Server Error!");
       }
-      const data = await response.json();
-      return data;
+      const responseData = await response.json();
+      return responseData;
     } catch (e) {
       return rejectWithValue(e.message);
     }
@@ -48,6 +48,7 @@ export const patchHeaderData = createAsyncThunk(
       } else {
         dispatch(updateHeader(responseData));
       }
+      return responseData;
     } catch (e) {
       return rejectWithValue(e.message);
     }

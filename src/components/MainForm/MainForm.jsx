@@ -12,26 +12,63 @@ import {
 import { Form, Formik } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import {
+  fetchFormData,
+  postFormData,
+  selectFormData,
+} from "../../store/slice/formDataSlice";
 import {
   fetchLinesData,
   selectLinesData,
 } from "../../store/slice/formLinesDataSlice";
-import { useParams } from "react-router-dom";
-import { fetchFormData, selectFormData } from "../../store/slice/formDataSlice";
-import { StyledInput } from "../CustomField/styles";
-import {
-  COLUMN_NAMES,
-  INIT_FORM_DATA,
-  generateInitialValues,
-  generateTableHeaders,
-  generateTableRows,
-} from "./helper";
 import {
   fetchHeadersData,
   getHeaderById,
   patchHeaderData,
 } from "../../store/slice/headersDataSlice";
 import { getCurrentDate } from "../../utils/date";
+import { StyledInput } from "../CustomField/styles";
+import {
+  COLUMN_NAMES,
+  INIT_FORM_DATA,
+  createFormDataList,
+  createHeaderData,
+  generateInitialValues,
+  generateTableHeaders,
+  generateTableRows,
+} from "./helper";
+
+const submitHandler = (
+  values,
+  formData,
+  header,
+  initData,
+  setInitData,
+  formId,
+  dispatch
+) => {
+  const currentDate = getCurrentDate();
+  const isNew = formId.toLowerCase().includes("new");
+  const lastLineId = formData.at(-1).f_pers_young_spec_line_id;
+
+  const headerData = createHeaderData(values, header, isNew, currentDate);
+
+  const formDataList = createFormDataList(
+    values,
+    formId,
+    lastLineId,
+    initData,
+    currentDate
+  );
+
+  dispatch(patchHeaderData(headerData));
+  formDataList.forEach((data) => dispatch(postFormData(data)));
+
+  setInitData(values);
+
+  // navigate(`/`);
+};
 
 export const MainForm = () => {
   const { formId } = useParams();
@@ -79,29 +116,16 @@ export const MainForm = () => {
       <Formik
         initialValues={initData}
         enableReinitialize
-        onSubmit={(values) => {
-          const currentDate = getCurrentDate();
-          const isNew = formId.toLowerCase().includes("new");
-          const data = {
-            f_pers_young_spec_id: header.f_pers_young_spec_id,
-            org_employee: header.org_employee,
-            rep_beg_period: values.rep_beg_period,
-            rep_end_period: values.rep_end_period,
-          };
-          if (isNew) {
-            data["insert_user"] = values.insert_user;
-            data["update_user"] = values.insert_user;
-            data["insert_date"] = currentDate;
-            data["update_date"] = currentDate;
-          } else {
-            data["insert_user"] = header.insert_user;
-            data["update_user"] = values.insert_user;
-            data["insert_date"] = header.insert_date;
-            data["update_date"] = currentDate;
-          }
-          dispatch(patchHeaderData(data));
-          // console.log(values);
-          // navigate(`/`);
+        onSubmit={async (values) => {
+          submitHandler(
+            values,
+            formData,
+            header,
+            initData,
+            setInitData,
+            formId,
+            dispatch
+          );
         }}
       >
         {() => (
