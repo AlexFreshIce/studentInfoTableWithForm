@@ -90,6 +90,7 @@ export const generateTableRows = (columns, rows) => {
               sx={{ textAlign: "right", height: "40px" }}
               type="number"
               inputMode="numeric"
+              required
             />
           </TableCell>
         );

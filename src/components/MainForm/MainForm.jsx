@@ -70,7 +70,6 @@ const submitHandler = (
   if (isHeaderChange) {
     dispatch(patchHeaderData(headerData));
   }
-
   formDataChangeList.forEach((data) => dispatch(postFormData(data)));
 
   setInitData(values);
@@ -156,6 +155,7 @@ export const MainForm = () => {
                   placeholder="Выберите дату"
                   sx={{ margin: "0 8px" }}
                   type="date"
+                  required
                 />
                 <label htmlFor="rep_end_period">и окончания</label>
                 <StyledInput
@@ -164,6 +164,7 @@ export const MainForm = () => {
                   placeholder="Выберите дату"
                   sx={{ margin: "0 8px" }}
                   type="date"
+                  required
                 />
                 <Typography>отчетного периода.</Typography>
               </Box>
@@ -176,6 +177,7 @@ export const MainForm = () => {
                   name="insert_user"
                   placeholder="Введите данные"
                   sx={{ margin: "0 8px", width: "480px" }}
+                  required
                 />
               </Box>
             </Box>
