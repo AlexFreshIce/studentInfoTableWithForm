@@ -1,8 +1,7 @@
-# React + Vite
+# Student info Table with Form
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Autor: Lukyanov A.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+#### Tech stack: HTML, CSS, JavaScript, React, Redux toolkit, React-table, React-router, Formik, Emotion(Styled Components), Mantine ui. 
+  
+[Link](https://magenta-eclair-091365.netlify.app/)
